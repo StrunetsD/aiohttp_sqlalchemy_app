@@ -58,7 +58,7 @@ app.router.add_post('/api/books', create_book)
 app.router.add_put('/api/books/{id}', update_book)
 app.router.add_delete('/api/books/{id}', delete_book)
 
-async def init_app(app):
+async def init_app():
     await init_db()
 
 if __name__ == '__main__':
