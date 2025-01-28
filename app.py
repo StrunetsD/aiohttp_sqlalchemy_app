@@ -9,7 +9,7 @@ async def get_books(request):
     async for session in get_db():
         result = await session.execute(select(Book))
         books = result.scalars().all()
-        return web.json_response([book.__dict__ for book in books])
+        return web.json_response([book.to_dict() for book in books])
 
 async def get_book(request):
     book_id = int(request.match_info['id'])
@@ -17,8 +17,8 @@ async def get_book(request):
         result = await session.execute(select(Book).filter(Book.id == book_id))
         book = result.scalar_one_or_none()
         if book:
-            return web.json_response(book.__dict__)
-        return web.HTTPNotFound()
+            return web.json_response(book.to_dict())
+    return web.HTTPNotFound()
 
 async def create_book(request):
     data = await request.json()
@@ -26,7 +26,7 @@ async def create_book(request):
     async for session in get_db():
         session.add(new_book)
         await session.commit()
-        return web.json_response(new_book.__dict__, status=201)
+        return web.json_response(new_book.to_dict(), status=201)
 
 async def update_book(request):
     book_id = int(request.match_info['id'])
@@ -38,8 +38,8 @@ async def update_book(request):
             for key, value in data.items():
                 setattr(book, key, value)
             await session.commit()
-            return web.json_response(book.__dict__)
-        return web.HTTPNotFound()
+            return web.json_response(book.to_dict())
+    return web.HTTPNotFound()
 
 async def delete_book(request):
     book_id = int(request.match_info['id'])
@@ -50,7 +50,7 @@ async def delete_book(request):
             await session.delete(book)
             await session.commit()
             return web.Response(status=204)
-        return web.HTTPNotFound()
+    return web.HTTPNotFound()
 
 app.router.add_get('/api/books', get_books)
 app.router.add_get('/api/books/{id}', get_book)
@@ -58,9 +58,9 @@ app.router.add_post('/api/books', create_book)
 app.router.add_put('/api/books/{id}', update_book)
 app.router.add_delete('/api/books/{id}', delete_book)
 
-async def init_app():
+async def init_app(app):
     await init_db()
 
 if __name__ == '__main__':
     app.on_startup.append(init_app)
-    web.run_app(app, host='127.0.0.1', port=8080)
+    web.run_app(app, host='0.0.0.0', port=8080)

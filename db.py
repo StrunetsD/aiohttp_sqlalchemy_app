@@ -1,14 +1,13 @@
-import asyncio
+import os
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from models import Base
 
-from dotenv import load_dotenv
-import os
+from models import Base
 
 load_dotenv()
 
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql+asyncpg://postgres:postgres@localhost/books')
+DATABASE_URL =  'postgresql+asyncpg://postgres:postgres@db/book'
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 
